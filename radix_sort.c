@@ -392,7 +392,7 @@ struct tablo* size_suffix(int size, struct tablo* flags, int (*funct)(int, int),
     return A;
 }
 
-void split_bit( struct tablo* source, struct tablo* flags, int (*funct)(int, int), int eltneutre, int N, int size){
+void split_bit( struct tablo* source, struct tablo* flags, int (*funct)(int, int), int eltneutre, int size){
 
     reverse_bit(flags);
     struct tablo* Idown = scan_prefix_final(flags,funct,eltneutre);
@@ -420,7 +420,7 @@ void split_bit( struct tablo* source, struct tablo* flags, int (*funct)(int, int
     free_tablo(Index);
 }
 
-void sort_by_digit(struct tablo* source, int nb_bit, int (*funct)(int, int), int eltneutre, int N, int size){
+void sort_by_digit(struct tablo* source, int nb_bit, int (*funct)(int, int), int eltneutre, int size){
     struct tablo* tab_bit = allocate_tablo(size);
 
     //Iteration sur les éléments du tableau
@@ -431,7 +431,7 @@ void sort_by_digit(struct tablo* source, int nb_bit, int (*funct)(int, int), int
             tab_bit->tab[j] = (source->tab[j] >> i) & 1;
         }
         //On va trier les éléments du tableau par rapport au bit n°i
-        split_bit(source,tab_bit,funct, eltneutre, N, size);
+        split_bit(source,tab_bit,funct, eltneutre, size);
     }
     free_tablo(tab_bit);
 }
@@ -492,11 +492,11 @@ int main(int argc, char **argv) {
 
     #ifdef _OPENMP
     omp_set_num_threads(nb_threads);
-    omp_set_nested(0); // autorise l'imbrication
-    omp_set_max_active_levels(0); // d'un niveau max de 0
+    omp_set_nested(1); // autorise l'imbrication
+    omp_set_max_active_levels(2); // d'un niveau max de 2
     #endif
 
-    printf("N = %i, array_size = %i, input = %s; output = %s, nb_threads = %i\n",N,array_size,input_file_name,output_file_name,nb_threads);
+    //printf("N = %i, array_size = %i, input = %s; output = %s, nb_threads = %i\n",N,array_size,input_file_name,output_file_name,nb_threads);
 
     if (is_input){
         generate_array_with_input(input_file_name,tmp);
@@ -507,20 +507,15 @@ int main(int argc, char **argv) {
 
     copy_array_same_size(tmp,copy);
 
-    //printf("Array to sort :\n");
-    //print_array(tmp);
-
     //Time beginning
     struct timeval start, end;
     gettimeofday(&start, NULL);
 
     //CHANGE THE FUNCTION "add" AND THE NEUTRAL ELEMENT HERE TO USE AN OTHER OPERATION LIKE "sub" OR "mult"
-    sort_by_digit(tmp, nb_bit, add, 0, N, array_size);
+    sort_by_digit(tmp, nb_bit, add, 0, array_size);
 
     //Time end
     gettimeofday(&end, NULL);
-
-    //print_array(tmp);
 
     generate_output(
             output_file_name,
@@ -535,5 +530,4 @@ int main(int argc, char **argv) {
 
     free_tablo(tmp);
     free_tablo(copy);
-    printf("%p\n",tmp);
 }
