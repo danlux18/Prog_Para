@@ -15,6 +15,7 @@ struct tablo {
     int size;
 };
 
+// Allocate an array of size size
 struct tablo * allocate_tablo(int size) {
     struct tablo * tmp = malloc(sizeof(struct tablo));
     tmp->size = size;
@@ -22,21 +23,13 @@ struct tablo * allocate_tablo(int size) {
     return tmp;
 }
 
+// Free the array tab_to_free
 void free_tablo(struct tablo* tab_to_free){
     free(tab_to_free->tab);
     free(tab_to_free);
 }
 
-void print_array(struct tablo * tmp) {
-    printf("---- Array of size %i ---- \n", tmp->size);
-    int size = tmp->size;
-    int i;
-    for (i = 0; i < size; ++i) {
-        printf("%i ", tmp->tab[i]);
-    }
-    printf("\n");
-}
-
+// Write in the array s all the number in the file file_name
 void generate_array_with_input(const char* file_name, struct tablo * s){
     int fd = open(file_name, O_RDONLY);
     if (fd < 0){
@@ -50,7 +43,7 @@ void generate_array_with_input(const char* file_name, struct tablo * s){
     int last_one = 0;
     while(read(fd, &c, 1)){
         if (index >= MAX_SIZE_NAME){
-            printf("File too big : %d, max_size = %d, try with something smaller !\n Exiting\n",index,MAX_SIZE_NAME);
+            printf("Number too big : %d, max_size = %d, try with something smaller !\n Exiting\n",index,MAX_SIZE_NAME);
             exit(1);
         }
         if (c != '\n' && c != ' '){
@@ -75,6 +68,7 @@ void generate_array_with_input(const char* file_name, struct tablo * s){
     free(str_nb);
 }
 
+// Write in the file with the file descriptor fd all the number of the array s
 void array_to_output(int fd, struct tablo * s, int nb_digits_max){
     char nb_str[nb_digits_max];
     for(int i = 0; i < s->size; i++){
@@ -87,6 +81,7 @@ void array_to_output(int fd, struct tablo * s, int nb_digits_max){
 
 }
 
+// Write in the file file_name the first line (N, size, nb_threads, time), the input array and the output array
 void generate_output(const char* file_name, int N, int array_size, int nb_threads, struct tablo* source, struct tablo* result, int time, int nb_digits_max){
     int fd = open(file_name, O_CREAT | O_TRUNC | O_WRONLY, S_IRWXU | S_IRWXG | S_IRWXO);
     if (fd < 0){
@@ -101,57 +96,6 @@ void generate_output(const char* file_name, int N, int array_size, int nb_thread
     close(fd);
 }
 
-
-// Generate an 12 size array
-void generate_example_array(struct tablo * s) {
-    s->size=12;
-    s->tab=malloc(s->size*sizeof(int));
-    s->tab[0]=5;
-    s->tab[1]=1021;
-    s->tab[2]=2;
-    s->tab[3]=9;
-    s->tab[4]=0;
-    s->tab[5]=23;
-    s->tab[6]=9;
-    s->tab[7]=512;
-    s->tab[8]=511;
-    s->tab[9]=8;
-    s->tab[10]=9;
-    s->tab[11]=5;
-}
-
-// Generate an 8 size array
-void generate_example_8_array(struct tablo * s) {
-    s->size=8;
-    s->tab=malloc(s->size*sizeof(int));
-    s->tab[0]=5;
-    s->tab[1]=1021;
-    s->tab[2]=2;
-    s->tab[3]=9;
-    s->tab[4]=0;
-    s->tab[5]=23;
-    s->tab[6]=9;
-    s->tab[7]=512;
-}
-
-void generate_simple_13_array(struct tablo * s) {
-    s->size=13;
-    s->tab=malloc(s->size*sizeof(int));
-    s->tab[0]=1;
-    s->tab[1]=2;
-    s->tab[2]=3;
-    s->tab[3]=4;
-    s->tab[4]=5;
-    s->tab[5]=6;
-    s->tab[6]=7;
-    s->tab[7]=8;
-    s->tab[8]=9;
-    s->tab[9]=10;
-    s->tab[10]=11;
-    s->tab[11]=12;
-    s->tab[12]=13;
-}
-
 // Generate an array with a size given and random value between 0 and max_value
 void generate_array(struct tablo * s, int size, int max_value) {
     s->size=size;
@@ -161,18 +105,12 @@ void generate_array(struct tablo * s, int size, int max_value) {
     }
 }
 
+// Function used in the prefix and suffix
 int add(int a, int b){
     return a + b;
 }
 
-int my_pow(int a, int p){
-    int res = a;
-    for(int i = 1; i < p-1;i++){
-        res *= a;
-    }
-    return res;
-}
-
+// Copy elements of an array source (size = N) in an array destination (size = 2 * N)
 void copy_array(struct tablo* source, struct tablo* destination){
     int const size = source->size;
     for(int i = 0; i < source->size;i++){
@@ -180,6 +118,7 @@ void copy_array(struct tablo* source, struct tablo* destination){
     }
 }
 
+// Copy elements of an array source (size = 2 * N) in an array destination (size = N)
 void copy_half_array(struct tablo* source, struct tablo* destination){
     int const size = destination->size;
     for(int i = 0; i < size;i++){
@@ -187,6 +126,7 @@ void copy_half_array(struct tablo* source, struct tablo* destination){
     }
 }
 
+// Copy elements of an array source (size = N) in an array destination (size = N)
 void copy_array_same_size(struct tablo* source, struct tablo* destination){
     int const size = destination->size;
     for(int i = 0; i < size;i++){
@@ -194,12 +134,14 @@ void copy_array_same_size(struct tablo* source, struct tablo* destination){
     }
 }
 
+// Reverse all the bit in the array source
 void reverse_bit(struct tablo* source){
     for(int i = 0; i < source->size; i++){
         source->tab[i] = !source->tab[i];
     }
 }
 
+// Permute the elements of the array source by changing there index by the new corresponding index in Index
 void permute(struct tablo* source, struct tablo* Index){
     struct tablo* res = allocate_tablo(source->size);
 
@@ -215,6 +157,7 @@ void permute(struct tablo* source, struct tablo* Index){
     free_tablo(res);
 }
 
+// Ascending phase for prefix and suffix for an array of size 2^n
 void montee(struct tablo* A, int (*funct)(int, int)){
     int m =(int) (log(A->size/2) /log(2));
     for(int l = m-1; l >= 0; l--){
@@ -225,6 +168,7 @@ void montee(struct tablo* A, int (*funct)(int, int)){
     }
 }
 
+// Descending phase for prefix for an array of size 2^n
 void descente_prefix(struct tablo* A, int (*funct)(int, int)){
     int m =(int) (log(A->size/2) /log(2));
     for(int l = 0; l < m; l++){
@@ -237,6 +181,7 @@ void descente_prefix(struct tablo* A, int (*funct)(int, int)){
     }
 }
 
+// Descending phase for suffix for an array of size 2^n
 void descente_suffix(struct tablo* B, int (*funct)(int, int)){
     int m = (int) log2(B->size/2) - 1;
     for(int l = 0; l<=m; l++) {
@@ -249,6 +194,7 @@ void descente_suffix(struct tablo* B, int (*funct)(int, int)){
     }
 }
 
+// Ascending and descending phase for prefix for an array of size 2^n
 struct tablo* scan_prefix(struct tablo* source, int (*funct)(int, int), int eltneutre){
     struct tablo* A = allocate_tablo(source->size*2);
     struct tablo* result = allocate_tablo(source->size);
@@ -265,6 +211,7 @@ struct tablo* scan_prefix(struct tablo* source, int (*funct)(int, int), int eltn
     return result;
 }
 
+// Ascending and descending phase for suffix for an array of size 2^n
 struct tablo* scan_suffix(struct tablo* source, int (*funct)(int, int), int eltneutre){
     struct tablo* A = allocate_tablo(source->size*2);
     struct tablo* result = allocate_tablo(source->size);
@@ -281,6 +228,7 @@ struct tablo* scan_suffix(struct tablo* source, int (*funct)(int, int), int eltn
     return result;
 }
 
+// Final step : scan to final result
 void scan_to_final(struct tablo* source, struct tablo* result){
     int size_min = source->size;
     #pragma omp parallel for
@@ -289,6 +237,7 @@ void scan_to_final(struct tablo* source, struct tablo* result){
     }
 }
 
+// Return an array of the binary writing of a number in base 10
 int* digit_to_binary(int digit) {
     int b;
     int k = 0;
@@ -303,17 +252,16 @@ int* digit_to_binary(int digit) {
     return bits;
 }
 
+// Prefix scan for an array of any size
 struct tablo* scan_prefix_final(struct tablo* source, int (*funct)(int, int), int eltneutre){
     int size = source->size;
-    //Convertir la taille du tableau pour faire les sous-tableaux : 17 = 10001 (tableau de taille 2^4 et 2^0)
     int* bin_tab = digit_to_binary(size);
-    //Nombre de bit max
+    // Number max of bit
     int size_bit_tab = (int) (log(size) /log(2))+1;
     struct tablo * result = allocate_tablo(size);
     int already_used = 0;
     int last_nb = 0;
     for(int i = 0;i<size_bit_tab;i++){
-        //Pour chaque sous-tableau de taile 2^i
         if(bin_tab[i]) {
             struct tablo *tmp = allocate_tablo(1 << i);
 
@@ -340,17 +288,16 @@ struct tablo* scan_prefix_final(struct tablo* source, int (*funct)(int, int), in
     return result;
 }
 
+// Suffix for an array of any size
 struct tablo* suffix_final(struct tablo* source, int (*funct)(int, int), int eltneutre){
     int size = source->size;
-    //Convertir la taille du tableau pour faire les sous-tableaux : 17 = 10001 (tableau de taille 2^4 et 2^0)
     int* bin_tab = digit_to_binary(size);
-    //Nombre de bit max
+    // Number max of bit
     int size_bit_tab = (int) (log(size) /log(2))+1;
     struct tablo * result = allocate_tablo(size);
     int already_used = 0;
     int last_nb = 0;
     for(int i = 0;i<size_bit_tab;i++){
-        //Pour chaque sous-tableau de taile 2^i
         if(bin_tab[i]) {
             struct tablo *tmp = allocate_tablo(1 << i);
 
@@ -381,6 +328,7 @@ struct tablo* suffix_final(struct tablo* source, int (*funct)(int, int), int elt
     return result;
 }
 
+// Array where the i element is size - Suffix[i]
 struct tablo* size_suffix(int size, struct tablo* flags, int (*funct)(int, int), int eltneutre){
     struct tablo* suf = suffix_final(flags, funct, eltneutre);
     struct tablo* A = allocate_tablo(size);
@@ -392,6 +340,7 @@ struct tablo* size_suffix(int size, struct tablo* flags, int (*funct)(int, int),
     return A;
 }
 
+// Generate the new index array with the array of the bit number i for each element and permute
 void split_bit( struct tablo* source, struct tablo* flags, int (*funct)(int, int), int eltneutre, int size){
 
     reverse_bit(flags);
@@ -420,17 +369,17 @@ void split_bit( struct tablo* source, struct tablo* flags, int (*funct)(int, int
     free_tablo(Index);
 }
 
+// Sort the array source bit by bit
 void sort_by_digit(struct tablo* source, int nb_bit, int (*funct)(int, int), int eltneutre, int size){
     struct tablo* tab_bit = allocate_tablo(size);
 
-    //Iteration sur les éléments du tableau
+    // Iteration on all the bit
     for (int i = 0; i <= nb_bit; i++){
-        //Itération sur les bits de chaque élément
+        // Iteration on each element
         for (int j=0; j < source->size;j++) {
-            // tab[j] va contenir 0 ou 1 (valeur
             tab_bit->tab[j] = (source->tab[j] >> i) & 1;
         }
-        //On va trier les éléments du tableau par rapport au bit n°i
+        // Sort element in relation to the bit i
         split_bit(source,tab_bit,funct, eltneutre, size);
     }
     free_tablo(tab_bit);
@@ -440,7 +389,7 @@ int main(int argc, char **argv) {
     struct tablo* tmp = malloc(sizeof(struct tablo));
     struct tablo* copy = malloc(sizeof(struct tablo));
 
-    // GESTION DES ARGUMENTS
+    // Argument management
     if (argc<4) {
         fprintf(stdout, "Usage: %s N array_size [input_file_name] output_file_name [number_of_threads, otherwise the by default number] \n", argv[0]);
         return -1;
@@ -452,13 +401,13 @@ int main(int argc, char **argv) {
     char* input_file_name = "";
     char* output_file_name;
     if (argc==5){
-        //ATTENTION : ne pas mettre de chiffre comme premier caractère du nom du fichier de sortie !!
-        //Si c'est un nombre ==> on met à jour le nombre de threads
+        // CAUTION: do not put a number as the first character of the output file name!!
+        // If it is a number, update the number of threads
         if (argv[4][0] >= '0' && argv[4][0] <= '9'){
             output_file_name = argv[3];
             nb_threads=atoi(argv[4]);
         }
-        //Sinon on met à jour le nom du fichier d'entrée
+        // Otherwise we update the name of the input file
         else {
             input_file_name = argv[3];
             output_file_name = argv[4];
@@ -475,29 +424,27 @@ int main(int argc, char **argv) {
         output_file_name = argv[3];
     }
 
-    //Pour enlever l'entrer
+    // To remove the output file if it already exist
     remove(output_file_name);
-
-    // REMPLISSAGE DU TABLEAU
 
     tmp->size = array_size;
     copy->size = array_size;
     tmp->tab = malloc(tmp->size * sizeof(int));
     copy->tab = malloc(copy->size * sizeof(int));
-    //nb digit : (int)log10(1)+1
-    //nb bit : (int) (log(185) /log(2))+1
 
     int nb_bit = (int) (log(N) /log(2))+1;
     int nb_digit_max = (int)log10(N)+1;
 
     #ifdef _OPENMP
+    // Define the number of threads we will use
     omp_set_num_threads(nb_threads);
-    omp_set_nested(1); // autorise l'imbrication
-    omp_set_max_active_levels(2); // d'un niveau max de 2
+    // We don't need nested parallelism in this program
+    omp_set_nested(0);
+    // Allow parallelism
+    omp_set_max_active_levels(1);
     #endif
 
-    //printf("N = %i, array_size = %i, input = %s; output = %s, nb_threads = %i\n",N,array_size,input_file_name,output_file_name,nb_threads);
-
+    // Array filling
     if (is_input){
         generate_array_with_input(input_file_name,tmp);
     }
@@ -507,11 +454,10 @@ int main(int argc, char **argv) {
 
     copy_array_same_size(tmp,copy);
 
-    //Time beginning
+    // Time beginning
     struct timeval start, end;
     gettimeofday(&start, NULL);
 
-    //CHANGE THE FUNCTION "add" AND THE NEUTRAL ELEMENT HERE TO USE AN OTHER OPERATION LIKE "sub" OR "mult"
     sort_by_digit(tmp, nb_bit, add, 0, array_size);
 
     //Time end
